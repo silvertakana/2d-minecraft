@@ -5,7 +5,7 @@ var tex = [],
 var loaded = false;
 var player;
 const bw = 50;
-function preload() {}
+function preload() { }
 function setup() {
 	loadFiles();
 	noiseSeed(666);
@@ -28,24 +28,21 @@ function draw() {
 		}
 		background(255);
 		game.render();
-		if (keyIsDown(32)) {
-			player.control(10000000000000);
-		} else {
-			player.control(0.03);
-		}
+		player.control(0.03, 0.02);
 
-		camX = player.pos.x + width / (2 * bw);
-		camY = player.pos.y + height / (2 * bw);
+		const cameraSmoothness = 10
+		camX += (player.pos.x + width / (2 * bw) - camX) / cameraSmoothness;
+		camY += (player.pos.y + height / (2 * bw) - camY) / cameraSmoothness;
 		player.show();
 	}
 	pop();
 	text(
 		"(x: " +
-			round(camX, 3) +
-			" y: " +
-			round(camY, 3) +
-			") fps: " +
-			round(frameRate(), 3),
+		round(camX, 3) +
+		" y: " +
+		round(camY, 3) +
+		") fps: " +
+		round(frameRate(), 3),
 		50,
 		50
 	);

@@ -6,9 +6,9 @@ class Player {
 		this.vel = createVector(0, 0);
 	}
 	isColliding() {
-		return game.getTile(this.pos.x, this.pos.y - this.width / bw) !== 0;
+		return game.getTile(this.pos.x, this.pos.y) !== 0 || game.getTile(this.pos.x, this.pos.y+this.width/bw*2) !== 0 ;
 	}
-	control(speed) {
+	control(speed,jumpHeight) {
 		if (keyIsDown(65)) {
 			this.vel.x += speed;
 		}
@@ -17,26 +17,22 @@ class Player {
 			this.vel.x -= speed;
 		}
 
-		if (keyIsDown(87)) {
-			this.vel.y += speed;
-		}
-
-		if (keyIsDown(83)) {
-			this.vel.y -= speed;
-		}
+		
 
 		this.vel.x *= this.friction;
 		let touchy = this.isColliding();
 		if (!touchy) {
-			// this.vel.y -= 0.005;
+			this.vel.y -= 0.005;
 		} else {
 			this.vel.y = 0;
-			let moveAmount = 1;
-			let changeMoveAmount = 1;
-
-			this.pos.x = round(this.pos.x);
-			this.pos.y = round(this.pos.y);
-			while (touchy) {
+			let moveAmount = 0.001;
+			let changeMoveAmount = 0.001;
+			// this.pos.x = floor(this.pos.x);
+			// this.pos.y = round(this.pos.y);
+			const maxSlope = 1000
+			let slope = 0
+			this.pos.y+=0.01;
+			while (!(!touchy || slope > maxSlope)) {
 				this.pos.y -= moveAmount;
 				if (!this.isColliding()) break;
 				this.pos.y += moveAmount;
@@ -44,16 +40,26 @@ class Player {
 				this.pos.y += moveAmount;
 				if (!this.isColliding()) break;
 				this.pos.y -= moveAmount;
-
-				this.pos.x += moveAmount;
-				if (!this.isColliding()) break;
-				this.pos.x -= moveAmount;
-
-				this.pos.x -= moveAmount;
-				if (!this.isColliding()) break;
-				this.pos.x += moveAmount;
 
 				moveAmount += changeMoveAmount;
+				slope++;
+			}
+			moveAmount = 0;
+			if(slope > maxSlope){
+				while(touchy){
+					this.pos.x += moveAmount;
+					if (!this.isColliding()) break;
+					this.pos.x -= moveAmount;
+
+					this.pos.x -= moveAmount;
+					if (!this.isColliding()) break;
+					this.pos.x += moveAmount;
+
+					moveAmount += changeMoveAmount;
+				}
+			}
+			if (keyIsDown(87)) {
+				this.vel.y += jumpHeight*5;
 			}
 		}
 
@@ -66,7 +72,7 @@ class Player {
 
 		rectMode(CENTER);
 		// translate(width/2,height/2)
-		translate((camX - pos.x) * bw, (camY - pos.y) * bw);
+		translate((camX - pos.x) * bw, (camY - (pos.y+this.width/bw)) * bw);
 		rect(0, 0, this.width, this.width * 2);
 		pop();
 	}
