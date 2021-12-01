@@ -27,8 +27,8 @@ class Game {
 		let coal = noise(x / 3, y / 3);
 		push();
 		noiseDetail(2, 2);
-		pop();
 		let cave = noise(x / 20 + 200, y / 20 + 200);
+		pop();
 
 		if (cave > 0.95) {
 			return 0;
